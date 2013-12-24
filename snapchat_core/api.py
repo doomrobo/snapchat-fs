@@ -235,7 +235,7 @@ class SnapchatSession():
             the POST request. Formatted like: {'data': ('file', data)}
         """
         uri = "%s%s" % (constants.ROOT_URL, resource)
-        result = requests.post(uri, request_params, files = files)
+        result = requests.post(uri, request_params, files = files, verify=True)
         if result.status_code != 200:
             raise Exception("POST request failed with status code %d" %
                             (result.status_code))
