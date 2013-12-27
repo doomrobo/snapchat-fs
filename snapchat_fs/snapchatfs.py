@@ -167,3 +167,13 @@ def upload_sfs_file(session, filename):
     sfs_id = session.generate_sfs_id(basename, data)
     session.upload_image(data, sfs_id)
     session.send_image_to(session.username, sfs_id)
+
+def delete_sfs_file(session, snap_id):
+    """
+    Deletes a file from Snapchat FS.
+
+    @session An SfsSession object that has been logged in.
+    @snap_id The ID of the snap to delete
+    """
+    session.delete_image(snap_id)
+    print util.green('Deleted file with ID ') + (snap_id)

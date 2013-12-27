@@ -10,6 +10,7 @@ from Crypto.Cipher import AES
 import constants
 from friend import Friend
 from snaps import Snap, SentSnap, ReceivedSnap
+import json
 
 __author__ = "Alex Clemmer, Chad Brubaker"
 __copyright__ = "Copyright 2013, Alex Clemmer and Chad Brubaker"
@@ -28,7 +29,9 @@ CAN_SEE_CUSTOM_STORIES = 'can_see_custom_stories'
 CLIENT_ID              = 'id'
 COUNTRY_CODE           = 'country_code'
 DISPLAY                = 'display'
+EVENTS                 = 'events'
 FRIENDS                = 'friends'
+JSON                   = 'json'
 MEDIA_ID               = 'media_id'
 NAME                   = 'name'
 PASSWORD               = 'password'
@@ -140,6 +143,52 @@ class SnapchatSession():
         # dispatch request
         result = SnapchatSession._post_or_fail(constants.SEND_RESOURCE
                                                , params)
+
+    # Thank you very much to gibsonsec for their API docs[1]
+    # and thank you to php-snapchat[2] for their reference implementation
+    # [1] http://gibsonsec.org/snapchat/fulldisclosure/#sending-updates-bqupdate_snaps
+    # [2] https://github.com/dstelljes/php-snapchat/blob/master/src/snapchat.php#L750
+    def delete_image(self, snap_id):
+        """
+        Deletes an image from Snapchat
+        @snap_id The ID of the snap to be deleted
+        """
+        # time.time() is the number of seconds since epoch represented as a float:
+        # <seconds since epoch>.<fractions of seconds>
+        snap_info = {
+            snap_id: {
+                't'        : int(time.time())
+              , 'c'        : 0
+              , 'replayed' : 0
+            }
+        }
+        # Say we viewed the snap 10 seconds ago and it expired just now,
+        # i.e., we viewed the snap for 10 seconds
+        event_one = {
+            'mEventName' : 'SNAP_VIEW'
+          , 'mTimestamp' : int(time.time())-10
+          , 'mParams'    : {'id': snap_id}
+        }
+        event_two = {
+            'mEventName' : 'SNAP_EXPIRED'
+          , 'mTimestamp' : int(time.time())
+          , 'mParams'    : {'id': snap_id}
+        }
+
+        events = [event_one, event_two]
+        timestamp = SnapchatSession._generate_timestamp()
+        # We must use json.dumps() because the API take strings as values,
+        # not JSON dicts
+        req_params = {
+            EVENTS      : json.dumps(events)
+          , JSON        : json.dumps(snap_info)
+          , TIMESTAMP   : timestamp
+          , USERNAME    : self.username
+          , REQ_TOKEN   : SnapchatSession._generate_req_token(
+              self.session_token, timestamp)
+        }
+        result = SnapchatSession._post_or_fail(constants.UPDATE_SNAPS_RESOURCE
+                                               , req_params)
 
     def get_snaps(self, filter_func=lambda snap: True):
         """

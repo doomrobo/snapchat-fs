@@ -6,6 +6,7 @@ Usage:
   sfs download_all <target_directory>
   sfs download <target_directory> <snap_id> ...
   sfs upload <file> ...
+  sfs delete <snap_id> ...
   sfs (-h | --help)
   sfs (-v | --version)
 
@@ -139,6 +140,9 @@ def cli(arguments):
     if arguments['upload']:
         for filename in arguments['<file>']:
             upload_sfs_file(session, filename)
+    if arguments['delete']:
+        for id in arguments['<snap_id>']:
+            delete_sfs_file(session, id)
 
 def main():
     global SETTINGS
