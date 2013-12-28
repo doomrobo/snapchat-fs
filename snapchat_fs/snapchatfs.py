@@ -147,10 +147,23 @@ def list_all_downloadable_sfs_files(session):
     """
     files = all_downloadable_sfs_files(session)
 
-    print '\t'.join([util.bold('Filename'), util.bold('Content hash'), util.bold('Snap ID')])
+    max_filename_len = 0
+    # Apparently snap IDs can have different lengths
+    max_id_len = 0
+    for filename, _, _, snap in files:
+        max_filename_len = max(max_filename_len, len(filename))
+        max_id_len = max(max_id_len, len(snap.id))
+    # Center the headers
+    print util.bold('{:^{width}}  ').format('Filename'
+                                            , width=max_filename_len) +\
+          util.bold('{:^{width}}  ').format('Content hash'
+                                            , width=23) +\
+          util.bold('{:^{width}}  ').format('Snap ID'
+                                            , width=max_id_len)
     for filename, content_hash, received_id, snap in files:
-        print '%s\t%s...%s\t%s' % (filename, content_hash[:17]
-                               , content_hash[-3:], snap.id)
+        print '{:<{f_width}}  {}...{}  {}'.format(filename, content_hash[:17]
+                                                  , content_hash[-3:], snap.id
+                                                  , f_width=max_filename_len)
 
 def upload_sfs_file(session, filename):
     """
