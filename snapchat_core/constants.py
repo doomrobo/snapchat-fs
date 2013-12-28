@@ -10,6 +10,7 @@ SEND_RESOURCE = "/bq/send"
 UPLOAD_RESOURCE = "/bq/upload"
 BLOB_RESOURCE = "/bq/blob"
 UPDATE_SNAPS_RESOURCE = "/bq/update_snaps"
+CLEAR_RESOURCE = "/ph/clear"
 
 # we pass this token to the service to "authenticate" that we're supposed
 # to be able to log in

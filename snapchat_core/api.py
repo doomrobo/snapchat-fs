@@ -190,6 +190,21 @@ class SnapchatSession():
         result = SnapchatSession._post_or_fail(constants.UPDATE_SNAPS_RESOURCE
                                                , req_params)
 
+    def clear_feed(self):
+        """
+        Clears the Snapchat feed of all snaps
+        """
+        timestamp = SnapchatSession._generate_timestamp()
+        req_params = {
+            USERNAME  : self.username
+          , TIMESTAMP : timestamp
+          , REQ_TOKEN   : SnapchatSession._generate_req_token(
+              self.session_token, timestamp)
+        }
+
+        result = SnapchatSession._post_or_fail(constants.CLEAR_RESOURCE
+                                               , req_params)
+
     def get_snaps(self, filter_func=lambda snap: True):
         """
         Returns array of Snaps sent to current user, represented as a list

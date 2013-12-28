@@ -177,3 +177,12 @@ def delete_sfs_file(session, snap_id):
     """
     session.delete_image(snap_id)
     print util.green('Deleted file with ID ') + (snap_id)
+
+def delete_all_files(session):
+    """
+    Deletes everything in the users Snapchat feed
+
+    @session An SfsSession object that has been logged in.
+    """
+    session.clear_feed()
+    print util.green('All files deleted')
