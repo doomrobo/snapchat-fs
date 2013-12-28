@@ -3,17 +3,16 @@
 
 Usage:
   sfs list
-  sfs download_all <target_directory>
-  sfs download <target_directory> <snap_id> ...
+  sfs download <target_directory> (--all | <snap_id> ...)
   sfs upload <file> ...
-  sfs delete <snap_id> ...
-  sfs delete_all
+  sfs delete (--all | <snap_id> ...)
   sfs (-h | --help)
   sfs (-v | --version)
 
 Options:
   -h --help        Show this screen
   -v --version     Show the version
+  -a --all         Select all files managed by SFS
 """
 from docopt import docopt
 import os, getpass, sys
@@ -129,23 +128,23 @@ def cli(arguments):
     session.login()
     if arguments['list']:
         list_all_downloadable_sfs_files(session)
-    if arguments['download_all']:
-        directory = arguments['<target_directory>']
-        create_dir_if_not_exists(directory)
-        download_all_sfs(session, directory)
     if arguments['download']:
         directory = arguments['<target_directory>']
-        snap_ids = arguments['<snap_id>']
         create_dir_if_not_exists(directory)
-        download_by_id(session, directory, snap_ids)
+        if arguments['--all']:
+            download_all_sfs(session, directory)
+        else:
+            snap_ids = arguments['<snap_id>']
+            download_by_id(session, directory, snap_ids)
     if arguments['upload']:
         for filename in arguments['<file>']:
             upload_sfs_file(session, filename)
     if arguments['delete']:
-        for id in arguments['<snap_id>']:
-            delete_sfs_file(session, id)
-    if arguments['delete_all']:
-        delete_all_files(session)
+        if arguments['--all']:
+            delete_all_files(session)
+        else:
+            for id in arguments['<snap_id>']:
+                delete_sfs_file(session, id)
 
 def main():
     global SETTINGS
