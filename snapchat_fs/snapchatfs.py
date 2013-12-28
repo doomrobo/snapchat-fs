@@ -147,10 +147,18 @@ def list_all_downloadable_sfs_files(session):
     """
     files = all_downloadable_sfs_files(session)
 
-    print '\t'.join([util.bold('Filename'), util.bold('Content hash'), util.bold('Snap ID')])
+    # We want at least 1 space between the two columns in any case
+    max_filename_len = len('Filename')-1
+    for filename, _, _, _ in files:
+        max_filename_len = max(max_filename_len, len(filename))
+    # Align the output
+    print util.bold('Filename')     + ' '*(max_filename_len + 2 - len('Filename')) +\
+          util.bold('Content hash') + ' '*(25 - len('Content hash')) +\
+          util.bold('Snap ID')
     for filename, content_hash, received_id, snap in files:
-        print '%s\t%s...%s\t%s' % (filename, content_hash[:17]
-                               , content_hash[-3:], snap.id)
+        print '%-*s  %s...%s  %s' % (max_filename_len, filename
+                                   , content_hash[:17], content_hash[-3:]
+                                   , snap.id)
 
 def upload_sfs_file(session, filename):
     """
